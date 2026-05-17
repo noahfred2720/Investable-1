@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investible — AI Investment Research</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0f6e56;--gl:#e1f5ee;--gm:#1d9e75;--gd:#085041;
+  --am:#854f0b;--al:#faeeda;--ab:#ef9f27;
+  --rd:#a32d2d;--rl:#fcebeb;
+  --bl:#185fa5;--bll:#e6f1fb;
+  --bg:#f7f6f3;--card:#fff;
+  --bdr:#e5e1d8;--bdr2:#cdc8be;
+  --tx:#18170f;--tx2:#6a6459;--tx3:#a09890;
+  --ff:'DM Sans',sans-serif;--fs:'Playfair Display',serif;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--ff);background:var(--bg);color:var(--tx);font-size:13px;}
+.app{display:flex;flex-direction:column;height:100vh;}
+
+/* TOPBAR */
+.topbar{height:54px;background:var(--card);border-bottom:1px solid var(--bdr);padding:0 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:9px;}
+.lmk{width:30px;height:30px;background:var(--gm);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.lmk svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.lnm{font-family:var(--fs);font-size:19px;letter-spacing:-.3px;color:var(--tx);}
+.tnav{display:flex;gap:2px;background:#eeebe5;border-radius:9px;padding:3px;}
+.tpl{background:transparent;border:none;padding:5px 16px;border-radius:7px;font-size:12px;font-family:var(--ff);font-weight:500;cursor:pointer;color:var(--tx2);transition:.15s;}
+.tpl.on{background:var(--card);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.09);}
+.tr{display:flex;align-items:center;gap:12px;}
+.mkt{display:flex;gap:14px;font-size:11px;}
+.mi{display:flex;gap:3px;align-items:center;}
+.mn{color:var(--tx3);}
+.mu{color:var(--gm);font-weight:600;}
+.md{color:var(--rd);font-weight:600;}
+.uav{width:30px;height:30px;border-radius:50%;background:var(--gl);border:2px solid var(--gm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g);}
+
+.body{flex:1;display:flex;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:200px;background:var(--card);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;}
+.sbp{margin:14px 12px 4px;background:var(--gl);border-radius:12px;padding:12px;}
+.sbpn{font-family:var(--fs);font-size:15px;color:var(--g);margin-bottom:6px;}
+.sbpr{display:flex;justify-content:space-between;font-size:11px;color:var(--tx2);margin-bottom:3px;}
+.sbpv{font-weight:600;color:var(--g);}
+.sbbr{height:3px;background:#c5e5da;border-radius:2px;margin-top:6px;overflow:hidden;}
+.sbf{height:100%;background:var(--gm);border-radius:2px;}
+.slbl{font-size:10px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;padding:0 14px;margin:14px 0 5px;}
+.si{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;color:var(--tx2);font-size:12px;font-weight:500;transition:.15s;border-left:3px solid transparent;}
+.si:hover{background:var(--bg);color:var(--tx);}
+.si.on{background:var(--gl);color:var(--g);border-left-color:var(--gm);}
+.si svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.scr{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.scr.on{display:flex;}
+
+/* ONBOARDING */
+.obd{flex:1;overflow-y:auto;padding:32px 44px;}
+.opg{display:flex;gap:5px;margin-bottom:26px;}
+.opd{flex:1;height:3px;border-radius:2px;background:var(--bdr);}
+.opd.dn{background:var(--gm);}
+.opd.cr{background:var(--gl);}
+.ost{display:none;}
+.ost.on{display:block;}
+.oic{width:52px;height:52px;background:var(--gm);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.oic svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.oh{font-family:var(--fs);font-size:26px;color:var(--tx);margin-bottom:8px;line-height:1.2;}
+.osb{font-size:13px;color:var(--tx2);margin-bottom:26px;line-height:1.65;max-width:480px;}
+.ofd{margin-bottom:20px;}
+.olb{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.oin{width:100%;border:1.5px solid var(--bdr2);border-radius:10px;padding:11px 14px;font-size:13px;font-family:var(--ff);background:var(--card);color:var(--tx);outline:none;transition:.15s;}
+.oin:focus{border-color:var(--gm);}
+.ota{width:100%;border:1.5px solid var(--bdr2);border-radius:10px;padding:11px 14px;font-size:13px;font-family:var(--ff);background:var(--card);color:var(--tx);resize:none;min-height:76px;outline:none;transition:.15s;}
+.ota:focus{border-color:var(--gm);}
+.oos{display:flex;flex-direction:column;gap:7px;}
+.oo{text-align:left;padding:11px 14px;border:1.5px solid var(--bdr2);border-radius:10px;font-size:13px;font-family:var(--ff);cursor:pointer;color:var(--tx);background:var(--card);transition:.15s;}
+.oo:hover{border-color:var(--gm);background:var(--gl);}
+.oo.sl{border-color:var(--gm);background:var(--gl);color:var(--g);font-weight:500;}
+.oft{padding:14px 44px;border-top:1px solid var(--bdr);background:var(--card);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.btnp{background:var(--gm);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-family:var(--ff);font-weight:600;cursor:pointer;transition:.15s;}
+.btnp:hover{background:var(--g);}
+.btng{background:transparent;border:1.5px solid var(--bdr2);border-radius:10px;padding:10px 18px;font-size:13px;font-family:var(--ff);cursor:pointer;color:var(--tx2);}
+
+/* MODE SELECT */
+.mw{flex:1;overflow-y:auto;padding:28px 32px;}
+.mh{font-family:var(--fs);font-size:24px;color:var(--tx);margin-bottom:6px;}
+.ms{font-size:13px;color:var(--tx2);margin-bottom:22px;line-height:1.6;}
+.mgr{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.mc{background:var(--card);border:1.5px solid var(--bdr);border-radius:14px;padding:22px;cursor:pointer;transition:.2s;}
+.mc:hover{border-color:var(--gm);transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,122,94,.1);}
+.mcic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.mcic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.mct{font-family:var(--fs);font-size:17px;color:var(--tx);margin-bottom:6px;}
+.mcd{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:10px;}
+.mcbl{font-size:11px;color:var(--tx2);margin-bottom:3px;}
+.mcbl::before{content:"→";color:var(--gm);margin-right:5px;}
+.disc{background:var(--al);border:1px solid var(--ab);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--am);line-height:1.55;}
+
+/* CHAT */
+.cw{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chd{padding:10px 18px;border-bottom:1px solid var(--bdr);background:var(--card);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.bkb{background:transparent;border:1px solid var(--bdr2);border-radius:7px;padding:5px 12px;font-size:11px;font-family:var(--ff);cursor:pointer;color:var(--tx2);}
+.bkb:hover{background:var(--bg);}
+.bdg{font-size:11px;font-weight:600;padding:4px 11px;border-radius:999px;}
+.fbar{padding:9px 18px;border-bottom:1px solid var(--bdr);background:var(--bg);display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.fb{background:var(--card);border:1px solid var(--bdr2);border-radius:999px;padding:5px 13px;font-size:11px;font-family:var(--ff);font-weight:500;cursor:pointer;color:var(--tx2);transition:.15s;}
+.fb.on{background:var(--gl);color:var(--g);border-color:var(--gm);}
+.fb:hover:not(.on){background:var(--bg);}
+.msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
+.mr{display:flex;gap:9px;align-items:flex-start;}
+.mr.u{flex-direction:row-reverse;}
+.cav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.cav.ai{background:var(--gl);color:var(--g);border:1.5px solid var(--gm);}
+.cav.u{background:var(--bll);color:var(--bl);}
+.bub{border-radius:12px;padding:10px 14px;font-size:12px;line-height:1.65;max-width:90%;}
+.bub.ai{background:var(--card);border:1px solid var(--bdr);color:var(--tx);}
+.bub.u{background:var(--gl);color:var(--g);}
+
+/* RICH CARD */
+.rc{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin:4px 0;width:100%;}
+.rch{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr);}
+.tkr{min-width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;text-align:center;line-height:1.2;padding:3px;}
+.rcnm{font-family:var(--fs);font-size:14px;color:var(--tx);}
+.rcmt{font-size:10px;color:var(--tx3);margin-top:2px;}
+.rcsc{margin-left:auto;text-align:right;flex-shrink:0;}
+.rcscn{font-size:20px;font-weight:700;}
+.rcscl{font-size:10px;color:var(--tx3);}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.sbox{background:var(--bg);border-radius:8px;padding:8px 10px;border:1px solid var(--bdr);}
+.sbl{font-size:10px;color:var(--tx3);margin-bottom:3px;}
+.sbv{font-size:13px;font-weight:600;color:var(--tx);}
+.sbv.g{color:var(--gm);}
+.sbv.a{color:var(--am);}
+.sbv.r{color:var(--rd);}
+
+/* INTERACTIVE CHART */
+.chwrap{margin-bottom:12px;background:var(--bg);border-radius:10px;padding:10px;border:1px solid var(--bdr);}
+.chheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.chprice{display:flex;align-items:baseline;gap:8px;}
+.chpriceval{font-size:18px;font-weight:500;color:var(--tx);}
+.chbadge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;}
+.chbadge.pos{background:var(--gl);color:var(--g);}
+.chbadge.neg{background:var(--rl);color:var(--rd);}
+.ctabs{display:flex;gap:3px;background:var(--card);border-radius:7px;padding:3px;border:1px solid var(--bdr);}
+.ctab{background:transparent;border:none;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;color:var(--tx2);font-family:var(--ff);transition:.1s;}
+.ctab.on{background:var(--bl);color:#fff;}
+.ctab:hover:not(.on){background:var(--bg);}
+canvas.pch{width:100%;display:block;border-radius:6px;}
+.chfoot{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--tx3);}
+
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.pcbox{border-radius:9px;padding:10px 12px;}
+.pct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.pci{font-size:11px;line-height:1.5;display:flex;gap:6px;margin-bottom:4px;align-items:flex-start;}
+.dot{flex-shrink:0;margin-top:5px;width:5px;height:5px;border-radius:50%;}
+.gcb{background:var(--al);border:1px solid var(--ab);border-radius:9px;padding:10px 12px;font-size:11px;color:var(--am);line-height:1.55;margin-bottom:10px;}
+.gct{font-weight:700;color:#412402;margin-bottom:4px;font-size:12px;}
+.fitb{border-radius:9px;padding:10px 12px;font-size:11px;line-height:1.55;margin-bottom:10px;}
+.timing{background:var(--bll);border:1px solid #85b7eb;border-radius:9px;padding:10px 12px;font-size:11px;color:var(--bl);line-height:1.55;margin-bottom:10px;}
+.ri{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:11px;line-height:1.5;color:var(--tx2);}
+.ri:last-child{border-bottom:none;}
+.ri strong{color:var(--tx);}
+.risksec{margin-bottom:10px;}
+.sech{font-size:12px;font-weight:600;color:var(--tx);margin:10px 0 6px;}
+.simr{display:flex;gap:7px;flex-wrap:wrap;}
+.simc{background:var(--bg);border:1px solid var(--bdr);border-radius:9px;padding:9px 12px;cursor:pointer;transition:.15s;flex:1;min-width:120px;}
+.simc:hover{border-color:var(--gm);background:var(--gl);}
+.simn{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px;}
+.simw{font-size:10px;color:var(--tx3);line-height:1.4;}
+.simbdg{font-size:9px;padding:2px 7px;border-radius:999px;display:inline-block;margin-top:4px;background:var(--gl);color:var(--g);}
+.biz{font-size:12px;color:var(--tx2);line-height:1.65;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:9px;border:1px solid var(--bdr);}
+
+/* LOADING */
+.ldr{display:flex;gap:4px;align-items:center;padding:6px 2px;}
+.ldr span{width:6px;height:6px;border-radius:50%;background:var(--gm);animation:ldp 1.2s infinite;}
+.ldr span:nth-child(2){animation-delay:.2s;}
+.ldr span:nth-child(3){animation-delay:.4s;}
+@keyframes ldp{0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+
+/* INPUT */
+.ia{border-top:1px solid var(--bdr);padding:12px 18px;background:var(--card);flex-shrink:0;}
+.qr{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.qb{background:var(--bg);border:1px solid var(--bdr2);border-radius:999px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--tx2);font-family:var(--ff);font-weight:500;transition:.15s;}
+.qb:hover{background:var(--gl);color:var(--g);}
+.ir{display:flex;gap:8px;}
+.ci{flex:1;border:1.5px solid var(--bdr2);border-radius:10px;padding:10px 14px;font-size:13px;font-family:var(--ff);background:var(--bg);color:var(--tx);outline:none;}
+.ci:focus{border-color:var(--gm);}
+.sbtn{background:var(--gm);color:#fff;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;font-family:var(--ff);font-size:13px;font-weight:500;}
+.sbtn:hover{background:var(--g);}
+.nt{font-size:10px;color:var(--tx3);margin-top:7px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="logo">
+    <div class="lmk"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+    <span class="lnm">Investible</span>
+  </div>
+  <div class="tnav" id="tnav" style="display:none">
+    <button class="tpl on" onclick="goTab('ideas',this)">💡 Ideas</button>
+    <button class="tpl" onclick="goTab('research',this)">🔍 Research</button>
+  </div>
+  <div class="tr">
+    <div class="mkt">
+      <div class="mi"><span class="mn">OMX30</span>&nbsp;<span class="mu">+0.8%</span></div>
+      <div class="mi"><span class="mn">S&P</span>&nbsp;<span class="mu">+0.4%</span></div>
+      <div class="mi"><span class="mn">DAX</span>&nbsp;<span class="mu">+1.1%</span></div>
+      <div class="mi"><span class="mn">Brent</span>&nbsp;<span class="md">-0.6%</span></div>
+    </div>
+    <div class="uav" id="uav">?</div>
+  </div>
+</div>
+
+<div class="body">
+<div class="sb" id="sidebar" style="display:none">
+  <div class="sbp" id="sbp"></div>
+  <div class="slbl" style="margin-top:8px">Analyse</div>
+  <div class="si on" id="sb-ideas" onclick="goTab('ideas',null,this)">
+    <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.6-4.5 6.7V18H9.5v-2.3C6.8 14.6 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
+    Ideas &amp; tips
+  </div>
+  <div class="si" id="sb-res" onclick="goTab('research',null,this)">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Company research
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ONBOARDING -->
+<div class="scr on" id="s-ob">
+  <div class="obd">
+    <div class="opg" id="opg"></div>
+    <div class="ost on" id="os0">
+      <div class="oic"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div class="oh">Welcome to Investible</div>
+      <div class="osb">Your AI investment analyst — personalised research, ideas, and deep-dives. Two minutes to set up.</div>
+      <div class="ofd"><div class="olb">Your name</div><input class="oin" id="ob-name" placeholder="e.g. Alex" value="Alex"></div>
+      <div class="ofd">
+        <div class="olb">How much are you planning to invest?</div>
+        <div class="oos">
+          <button class="oo" onclick="pick('amt',this,'u500')">Under €500</button>
+          <button class="oo sl" onclick="pick('amt',this,'500-2k')">€500 – €2,000</button>
+          <button class="oo" onclick="pick('amt',this,'2k-10k')">€2,000 – €10,000</button>
+          <button class="oo" onclick="pick('amt',this,'10k+')">More than €10,000</button>
+        </div>
+      </div>
+      <div class="ofd">
+        <div class="olb">Investment horizon</div>
+        <div class="oos">
+          <button class="oo" onclick="pick('hor',this,'u1')">Under 1 year</button>
+          <button class="oo" onclick="pick('hor',this,'1-3')">1–3 years</button>
+          <button class="oo sl" onclick="pick('hor',this,'3-10')">3–10 years</button>
+          <button class="oo" onclick="pick('hor',this,'10+')">10+ years</button>
+        </div>
+      </div>
+    </div>
+    <div class="ost" id="os1">
+      <div class="oh">Risk &amp; goals</div>
+      <div class="osb">This shapes everything the AI gives you.</div>
+      <div class="ofd">
+        <div class="olb">If your investment dropped 25% in one month…</div>
+        <div class="oos">
+          <button class="oo sl" onclick="pick('risk',this,'low')">I'd panic and sell immediately</button>
+          <button class="oo" onclick="pick('risk',this,'med')">Stressed but I'd hold on</button>
+          <button class="oo" onclick="pick('risk',this,'high')">I'd stay calm — maybe buy more</button>
+        </div>
+      </div>
+      <div class="ofd">
+        <div class="olb">Main goal</div>
+        <div class="oos">
+          <button class="oo" onclick="pick('goal',this,'longterm')">Grow wealth slowly, long term</button>
+          <button class="oo sl" onclick="pick('goal',this,'specific')">Save for something specific</button>
+          <button class="oo" onclick="pick('goal',this,'income')">Passive income / dividends</button>
+          <button class="oo" onclick="pick('goal',this,'growth')">High growth — I accept high risk</button>
+        </div>
+      </div>
+      <div class="ofd">
+        <div class="olb">Sectors, countries, or themes you're curious about</div>
+        <textarea class="ota" id="ob-int" placeholder="e.g. Nordic stocks, sustainable energy, tech…">Nordic and European stocks, sustainable energy, some tech</textarea>
+      </div>
+    </div>
+    <div class="ost" id="os2">
+      <div class="oh">Knowledge &amp; reason</div>
+      <div class="osb">The AI adapts to your level — no judgment.</div>
+      <div class="ofd">
+        <div class="olb">Experience level</div>
+        <div class="oos">
+          <button class="oo sl" onclick="pick('exp',this,'beginner')">Complete beginner — never invested</button>
+          <button class="oo" onclick="pick('exp',this,'some')">Some experience — a few funds or stocks</button>
+          <button class="oo" onclick="pick('exp',this,'confident')">Comfortable — follow markets regularly</button>
+          <button class="oo" onclick="pick('exp',this,'advanced')">Advanced — deep research myself</button>
+        </div>
+      </div>
+      <div class="ofd">
+        <div class="olb">Why are you investing right now?</div>
+        <textarea class="ota" id="ob-why" placeholder="e.g. savings earning nothing…">I have €800 in savings earning almost nothing. I want it to grow but I'm scared of losing it.</textarea>
+      </div>
+    </div>
+    <div class="ost" id="os3">
+      <div class="oh">Your AI analyst is ready</div>
+      <div class="osb">Profile built. Every response will be tailored specifically to you.</div>
+      <div id="ob-preview" style="background:var(--gl);border-radius:14px;padding:18px;margin-bottom:16px;"></div>
+      <div style="background:var(--al);border:1px solid var(--ab);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--am);line-height:1.6;">
+        ⚠️ Investible provides AI-powered research, tips, and ideas. <strong>You make all investment decisions yourself.</strong> Not regulated financial advice.
+      </div>
+    </div>
+  </div>
+  <div class="oft">
+    <button class="btng" id="ob-back" onclick="obBack()" style="visibility:hidden">← Back</button>
+    <button class="btnp" id="ob-next" onclick="obNext()">Continue →</button>
+  </div>
+</div>
+
+<!-- MODE SELECT -->
+<div class="scr" id="s-mode">
+  <div class="mw">
+    <div class="mh" id="mh">Good morning 👋</div>
+    <div class="ms">Choose a mode — both are fully personalised to your profile.</div>
+    <div class="mgr">
+      <div class="mc" onclick="goTab('ideas')">
+        <div class="mcic" style="background:var(--gl);color:var(--g)"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.6-4.5 6.7V18H9.5v-2.3C6.8 14.6 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div>
+        <div class="mct">Investment ideas &amp; tips</div>
+        <div class="mcd">Ask broadly or be very specific. Rich coloured cards with pros, cons, interactive charts, and the hidden game-changers others miss.</div>
+        <div class="mcbl">By country, sector, risk level, or theme</div>
+        <div class="mcbl">Pros, cons &amp; game-changers with 6-span charts</div>
+        <div class="mcbl">Personalised — not generic tips</div>
+      </div>
+      <div class="mc" onclick="goTab('research')">
+        <div class="mcic" style="background:var(--bll);color:var(--bl)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="mct">Company research</div>
+        <div class="mcd">Type any company — even roughly. Full deep-dive with interactive 6-timespan chart, stats, risks, and similar companies.</div>
+        <div class="mcbl">Financials, moat, management, risks</div>
+        <div class="mcbl">24H · 1W · 1M · 3M · 6M · 1Y charts</div>
+        <div class="mcbl">Similar companies — one click to research</div>
+      </div>
+    </div>
+    <div class="disc">⚠️ Investible gives you AI research and ideas — <strong>you</strong> make all investment decisions yourself. Not financial advice.</div>
+  </div>
+</div>
+
+<!-- IDEAS -->
+<div class="scr" id="s-ideas">
+  <div class="cw">
+    <div class="chd">
+      <button class="bkb" onclick="show('s-mode')">← Back</button>
+      <span class="bdg" style="background:var(--gl);color:var(--g)">💡 Ideas &amp; tips</span>
+      <span style="font-size:11px;color:var(--tx3);margin-left:4px">Personalised · Rich cards · 6-span charts</span>
+    </div>
+    <div class="fbar">
+      <button class="fb on" onclick="filt(this)">All</button>
+      <button class="fb" onclick="filt(this)">Nordic</button>
+      <button class="fb" onclick="filt(this)">Sustainable</button>
+      <button class="fb" onclick="filt(this)">Low risk</button>
+      <button class="fb" onclick="filt(this)">Dividend</button>
+      <button class="fb" onclick="filt(this)">ETF</button>
+    </div>
+    <div class="msgs" id="i-msgs"></div>
+    <div class="ia">
+      <div class="qr">
+        <button class="qb" onclick="askI('Nordic dividend stocks with 10+ year unbroken track record — go deep, game-changers, pros cons, chart')">Nordic dividends 10yr+</button>
+        <button class="qb" onclick="askI('Sustainable energy investments in Europe — specific companies or ETFs, full analysis with charts')">European green energy</button>
+        <button class="qb" onclick="askI('Best low risk ideas for current European interest rate environment')">Low risk right now</button>
+        <button class="qb" onclick="askI('S&P 500 ETF — full advantages risks chart and verdict for my profile')">S&P 500 ETF</button>
+      </div>
+      <div class="ir">
+        <input class="ci" id="i-in" placeholder="Ask broadly or specifically — country, sector, risk, theme, company name…" onkeydown="if(event.key==='Enter')askI()">
+        <button class="sbtn" onclick="askI()">Send</button>
+      </div>
+      <div class="nt">Investible gives you research and ideas. You decide what to do with them.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESEARCH -->
+<div class="scr" id="s-res">
+  <div class="cw">
+    <div class="chd">
+      <button class="bkb" onclick="show('s-mode')">← Back</button>
+      <span class="bdg" style="background:var(--bll);color:var(--bl)">🔍 Research</span>
+      <span style="font-size:11px;color:var(--tx3);margin-left:4px">Deep analysis · 6-span charts · Smart search</span>
+    </div>
+    <div class="msgs" id="r-msgs"></div>
+    <div class="ia">
+      <div class="qr">
+        <button class="qb" onclick="askR('XACT OMXS30 ETF — full deep dive Riksbank sensitivity all top holdings chart wait or buy now game-changer')">XACT OMXS30</button>
+        <button class="qb" onclick="askR('Vestas Wind Systems — financials moat risks game-changer chart wait or buy verdict')">Vestas Wind</button>
+        <button class="qb" onclick="askR('Novo Nordisk — CagriSema failure competitor threats chart wait or buy')">Novo Nordisk</button>
+        <button class="qb" onclick="askR('Investor AB — full holding breakdown NAV discount chart verdict')">Investor AB</button>
+      </div>
+      <div class="ir">
+        <input class="ci" id="r-in" placeholder="Type any company — even roughly, e.g. 'investor', 'vestas', 'novo'…" onkeydown="if(event.key==='Enter')askR()">
+        <button class="sbtn" onclick="askR()">Research</button>
+      </div>
+      <div class="nt">Investible gives you research and ideas. You decide what to do with them.</div>
+    </div>
+  </div>
+</div>
+
+</div></div></div>
+
+<script>
+const P={name:'Alex',amt:'500-2k',hor:'3-10',risk:'low',goal:'specific',int:'Nordic and European stocks, sustainable energy, some tech',exp:'beginner',why:'€800 in savings earning nothing. Want growth but scared of losing.'};
+const pks={};let obS=0;const NS=4;let chartRenderers={},chartCounter=0;
+
+function prog(){document.getElementById('opg').innerHTML=Array.from({length:NS},(_,i)=>`<div class="opd ${i<obS?'dn':i===obS?'cr':''}"></div>`).join('');}prog();
+function pick(k,el,v){el.closest('.oos').querySelectorAll('.oo').forEach(o=>o.classList.remove('sl'));el.classList.add('sl');pks[k]=v;}
+
+function obNext(){
+  if(obS===0){P.name=document.getElementById('ob-name').value||'Alex';if(pks.amt)P.amt=pks.amt;if(pks.hor)P.hor=pks.hor;}
+  else if(obS===1){if(pks.risk)P.risk=pks.risk;if(pks.goal)P.goal=pks.goal;P.int=document.getElementById('ob-int').value||P.int;}
+  else if(obS===2){if(pks.exp)P.exp=pks.exp;P.why=document.getElementById('ob-why').value||P.why;
+    document.getElementById('ob-preview').innerHTML=`<div style="font-family:var(--fs);font-size:15px;color:var(--g);margin-bottom:10px">${P.name}'s profile</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--tx2)"><div>Amount: <strong style="color:var(--tx)">${P.amt==='500-2k'?'€500–€2k':P.amt}</strong></div><div>Horizon: <strong style="color:var(--tx)">${P.hor}yr</strong></div><div>Risk: <strong style="color:var(--g)">${P.risk==='low'?'Cautious':P.risk==='med'?'Moderate':'Bold'}</strong></div><div>Goal: <strong style="color:var(--tx)">${P.goal}</strong></div><div style="grid-column:1/-1">Interests: ${P.int}</div></div>`;
+  }else if(obS===3){finishOB();return;}
+  document.getElementById('os'+obS).classList.remove('on');obS++;document.getElementById('os'+obS).classList.add('on');prog();
+  document.getElementById('ob-back').style.visibility=obS>0?'visible':'hidden';
+  if(obS===NS-1)document.getElementById('ob-next').textContent='Enter Investible →';
+}
+function obBack(){document.getElementById('os'+obS).classList.remove('on');obS--;document.getElementById('os'+obS).classList.add('on');prog();document.getElementById('ob-back').style.visibility=obS>0?'visible':'hidden';document.getElementById('ob-next').textContent='Continue →';}
+function finishOB(){
+  document.getElementById('uav').textContent=P.name.charAt(0).toUpperCase();
+  document.getElementById('mh').textContent='Good morning, '+P.name+' 👋';
+  document.getElementById('tnav').style.display='flex';
+  document.getElementById('sidebar').style.display='flex';
+  document.getElementById('sbp').innerHTML=`<div class="sbpn">${P.name}</div><div class="sbpr"><span>Risk</span><span class="sbpv">${P.risk==='low'?'Cautious':P.risk==='med'?'Moderate':'Bold'}</span></div><div class="sbpr"><span>Horizon</span><span>${P.hor}yr</span></div><div class="sbbr"><div class="sbf" style="width:${P.risk==='low'?28:P.risk==='med'?62:92}%"></div></div>`;
+  show('s-mode');initChats();
+}
+
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function goTab(tab,tBtn,sbBtn){
+  show(tab==='ideas'?'s-ideas':'s-res');
+  if(tBtn){document.querySelectorAll('.tpl').forEach(p=>p.classList.remove('on'));tBtn.classList.add('on');}
+  document.querySelectorAll('.si').forEach(i=>i.classList.remove('on'));
+  document.getElementById(tab==='ideas'?'sb-ideas':'sb-res').classList.add('on');
+  if(sbBtn)sbBtn.classList.add('on');
+}
+function filt(btn){document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+
+// SYSTEM PROMPT
+function sys(){
+  return `You are Investible's AI investment analyst. Personalised, specific, deeply researched. NEVER generic.
+USER: Name:${P.name}, Amount:€800(${P.amt}), Horizon:${P.hor}yr, Risk:${P.risk}(panics at -25%), Goal:${P.goal}, Interests:${P.int}, Exp:${P.exp}, Reason:${P.why}
+RULE 1: If input is vague/misspelled interpret confidently. Start with "(Interpreting as [X].)"
+RULE 2: Always respond with JSON inside <IDATA> tags.
+IDEAS format: <IDATA>{"type":"ideas","items":[{"ticker":"TICK","name":"Full Name","exchange":"Exchange","sector":"Sector","score":82,"scoreColor":"green","tkrBg":"#e1f5ee","tkrTx":"#085041","stats":[{"l":"Yield","v":"2.9%","c":"green"},{"l":"Fee","v":"0.10%","c":"green"},{"l":"Return","v":"8%/yr","c":"green"},{"l":"Risk","v":"Low","c":"amber"}],"chartVals":[100,103,101,106,110,108,112,115,113,118,120,123,126],"chartColor":"#1d9e75","pros":["Specific pro 1","Specific pro 2","Specific pro 3"],"cons":["Specific con 1","Specific con 2","Specific con 3"],"gc":"Non-obvious game-changer — specific real data.","fit":"Personalised verdict for ${P.name}.","similar":[{"n":"Company A","w":"Why similar","b":"Low risk"}]}]}</IDATA>
+RESEARCH format: <IDATA>{"type":"research","co":{"ticker":"TICK","name":"Full Name","exchange":"Exchange","sector":"Sector","founded":"Year","score":71,"scoreColor":"amber","tkrBg":"#faeeda","tkrTx":"#633806","stats":[{"l":"Revenue","v":"€17B","c":"green"},{"l":"Margin","v":"4.9%","c":"amber"},{"l":"Net debt","v":"€1.2B","c":"red"},{"l":"P/E","v":"38x","c":"amber"},{"l":"Backlog","v":"€20B","c":"green"},{"l":"Mkt cap","v":"€14B","c":"default"}],"chartVals":[130,138,135,142,155,148,160,158,152,145,149,153,158],"chartColor":"#0f6e56","bizModel":"Business model.","moat":"Competitive moat.","mgmt":"Management quality.","risks":[{"icon":"red","t":"Risk","b":"Specific risk."},{"icon":"amber","t":"Risk","b":"Specific."}],"gc":"Non-obvious game-changer with real numbers.","timing":"Wait or invest now — both sides then personalised suggestion.","fit":"Honest verdict for ${P.name}.","similar":[{"n":"A","w":"Why","b":"Badge"}]}}</IDATA>
+RULE 3: Use real company names, real numbers. chartVals: 13 realistic monthly points May 25–May 26. scoreColor: green=75+,amber=50-74,red=<50.`;
+}
+
+// CHART ENGINE
+function makeChartData(y1,color){
+  const n=y1.length,last=y1[n-1];
+  function sub(from){return y1.slice(Math.floor(n*(1-from)));}
+  const h24=Array.from({length:24},(_,i)=>parseFloat((last+(Math.sin(i*.7)*.3+Math.cos(i*1.3)*.2)-0.15+i*.008).toFixed(2)));
+  h24[23]=last;
+  function rng(vals,s,m,e){const pct=((vals[vals.length-1]-vals[0])/vals[0]*100);return{vals,start:s,mid:m,end:e,price:'$'+last.toFixed(2),change:(pct>=0?'+':'')+pct.toFixed(2)+'%',pos:pct>=0};}
+  return{'24h':rng(h24,'00:00','12:00','23:59'),'1w':rng(sub(.08),'Mon','Wed','Sun'),'1m':rng(sub(.2),'4wk ago','2wk ago','Today'),'3m':rng(sub(.3),'3mo ago','6wk ago','Today'),'6m':rng(sub(.5),'Nov 25','Feb 26','May 26'),'1y':rng(y1,'May 25','Nov 25','May 26'),color,last};
+}
+
+function drawC(canvas,vals,color){
+  const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||500,H=90;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const mn=Math.min(...vals)*.985,mx=Math.max(...vals)*1.015;
+  const toY=v=>H-6-((v-mn)/(mx-mn))*(H-14);
+  const toX=i=>i*(W-4)/(vals.length-1)+2;
+  ctx.strokeStyle='rgba(128,128,128,0.08)';ctx.lineWidth=1;
+  [.25,.5,.75].forEach(f=>{const y=H-6-f*(H-14);ctx.beginPath();ctx.moveTo(2,y);ctx.lineTo(W-2,y);ctx.stroke();});
+  const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,color+'44');gr.addColorStop(1,color+'00');
+  ctx.beginPath();ctx.moveTo(toX(0),toY(vals[0]));
+  for(let i=1;i<vals.length;i++){const cx=(toX(i-1)+toX(i))/2;ctx.bezierCurveTo(cx,toY(vals[i-1]),cx,toY(vals[i]),toX(i),toY(vals[i]));}
+  ctx.lineTo(toX(vals.length-1),H);ctx.lineTo(toX(0),H);ctx.closePath();ctx.fillStyle=gr;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.moveTo(toX(0),toY(vals[0]));
+  for(let i=1;i<vals.length;i++){const cx=(toX(i-1)+toX(i))/2;ctx.bezierCurveTo(cx,toY(vals[i-1]),cx,toY(vals[i]),toX(i),toY(vals[i]));}
+  ctx.stroke();
+  [[0,vals[0]],[vals.length-1,vals[vals.length-1]]].forEach(([i,v])=>{ctx.beginPath();ctx.arc(toX(i),toY(v),3.5,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+}
+
+function buildChartHTML(y1Vals,color){
+  const id='ch_'+(chartCounter++);
+  const data=makeChartData(y1Vals,color);
+  const pid=id+'_p',bid=id+'_b',sid=id+'_s',mid=id+'_m',eid=id+'_e';
+  const d1y=data['1y'];
+  const tabHtml=['24h','1w','1m','3m','6m','1y'].map((t,i)=>`<button class="ctab${i===5?' on':''}" data-cg="${id}" onclick="chartRenderers['${id}'](${JSON.stringify(t)},this)">${t.toUpperCase()}</button>`).join('');
+  const html=`<div class="chwrap"><div class="chheader"><div class="chprice"><span class="chpriceval" id="${pid}">${d1y.price}</span><span class="chbadge pos" id="${bid}">${d1y.change}</span></div><div class="ctabs" data-cg="${id}">${tabHtml}</div></div><canvas class="pch" id="${id}" height="90"></canvas><div class="chfoot"><span id="${sid}">${d1y.start}</span><span id="${mid}">${d1y.mid}</span><span id="${eid}">${d1y.end}</span></div></div>`;
+  setTimeout(()=>{
+    let cur='1y';
+    function render(range,btn){
+      cur=range;const d=data[range];
+      document.querySelectorAll('[data-cg="'+id+'"] .ctab').forEach(b=>b.classList.remove('on'));
+      if(btn)btn.classList.add('on');
+      document.getElementById(pid).textContent=d.price;
+      const badge=document.getElementById(bid);badge.textContent=d.change;badge.className='chbadge '+(d.pos?'pos':'neg');
+      document.getElementById(sid).textContent=d.start;document.getElementById(mid).textContent=d.mid;document.getElementById(eid).textContent=d.end;
+      setTimeout(()=>{const c=document.getElementById(id);if(c)drawC(c,d.vals,data.color);},20);
+    }
+    chartRenderers[id]=render;
+    render('1y',document.querySelector('[data-cg="'+id+'"] .ctab:last-child'));
+    const canvas=document.getElementById(id);
+    if(canvas){
+      canvas.addEventListener('mousemove',e=>{
+        const d=data[cur],r=canvas.getBoundingClientRect();
+        const x=e.clientX-r.left;
+        const idx=Math.max(0,Math.min(d.vals.length-1,Math.round(x/r.width*(d.vals.length-1))));
+        document.getElementById(pid).textContent='$'+d.vals[idx].toFixed(2);
+        const pct=((d.vals[idx]-d.vals[0])/d.vals[0]*100).toFixed(2);
+        const badge=document.getElementById(bid);badge.textContent=(pct>=0?'+':'')+pct+'%';badge.className='chbadge '+(pct>=0?'pos':'neg');
+      });
+      canvas.addEventListener('mouseleave',()=>render(cur,null));
+    }
+  },100);
+  return html;
+}
+
+// CARD BUILDERS
+function sc(c){return c==='green'?'g':c==='amber'?'a':c==='red'?'r':'';}
+function ic(i){return i==='red'?'#a32d2d':i==='amber'?'#854f0b':'#185fa5';}
+
+function buildIdea(item,idx){
+  const cols=[['#e1f5ee','#085041'],['#e6f1fb','#0c447c'],['#faeeda','#633806'],['#eeedfe','#3c3489']];
+  const[bg,tx]=item.tkrBg?[item.tkrBg,item.tkrTx]:cols[idx%cols.length];
+  const scC=item.scoreColor==='green'?'#1d9e75':item.scoreColor==='amber'?'#854f0b':'#a32d2d';
+  const ch=item.chartVals?buildChartHTML(item.chartVals,item.chartColor||'#1d9e75'):'';
+  return`<div class="rc"><div class="rch"><div class="tkr" style="background:${bg};color:${tx}">${item.ticker||'?'}</div><div><div class="rcnm">${item.name||''}</div><div class="rcmt">${item.exchange||''} · ${item.sector||''}</div></div><div class="rcsc"><div class="rcscn" style="color:${scC}">${item.score||'—'}</div><div class="rcscl">AI fit score</div></div></div>
+<div class="sg">${(item.stats||[]).map(s=>`<div class="sbox"><div class="sbl">${s.l}</div><div class="sbv ${sc(s.c)}">${s.v}</div></div>`).join('')}</div>${ch}
+<div class="pcg"><div class="pcbox" style="background:var(--gl)"><div class="pct" style="color:var(--gd)">✓ Why it could work</div>${(item.pros||[]).map(p=>`<div class="pci" style="color:var(--g)"><div class="dot" style="background:var(--gm)"></div><span>${p}</span></div>`).join('')}</div><div class="pcbox" style="background:var(--rl)"><div class="pct" style="color:var(--rd)">✗ Why it might not</div>${(item.cons||[]).map(c=>`<div class="pci" style="color:var(--rd)"><div class="dot" style="background:var(--rd)"></div><span>${c}</span></div>`).join('')}</div></div>
+${item.gc?`<div class="gcb"><div class="gct">🔍 Game-changer — what most analysis misses</div>${item.gc}</div>`:''}
+${item.fit?`<div class="fitb" style="background:var(--gl);color:var(--gd)"><strong>For ${P.name}:</strong> ${item.fit}</div>`:''}
+${item.similar&&item.similar.length?`<div class="sech">Research similar</div><div class="simr">${item.similar.map(s=>`<div class="simc" onclick="doRes(${JSON.stringify(s.n)})"><div class="simn">${s.n}</div><div class="simw">${s.w}</div><span class="simbdg">${s.b}</span></div>`).join('')}</div>`:''}
+</div>`;
+}
+
+function buildRes(co){
+  const scC=co.scoreColor==='green'?'#1d9e75':co.scoreColor==='amber'?'#854f0b':'#a32d2d';
+  const ch=co.chartVals?buildChartHTML(co.chartVals,co.chartColor||'#1d9e75'):'';
+  return`<div class="rc"><div class="rch"><div class="tkr" style="background:${co.tkrBg||'#e6f1fb'};color:${co.tkrTx||'#0c447c'}">${co.ticker||'?'}</div><div><div class="rcnm">${co.name||''}</div><div class="rcmt">${co.exchange||''} · ${co.sector||''} · Founded ${co.founded||'—'}</div></div><div class="rcsc"><div class="rcscn" style="color:${scC}">${co.score||'—'}</div><div class="rcscl">AI fit for ${P.name}</div></div></div>
+<div class="sg">${(co.stats||[]).map(s=>`<div class="sbox"><div class="sbl">${s.l}</div><div class="sbv ${sc(s.c)}">${s.v}</div></div>`).join('')}</div>${ch}
+${co.bizModel?`<div class="sech">Business model</div><div class="biz">${co.bizModel}</div>`:''}
+${co.moat?`<div class="sech">Competitive moat</div><div style="font-size:12px;color:var(--tx2);line-height:1.65;margin-bottom:10px">${co.moat}</div>`:''}
+${co.mgmt?`<div class="sech">Management</div><div style="font-size:12px;color:var(--tx2);line-height:1.65;margin-bottom:10px">${co.mgmt}</div>`:''}
+${co.risks&&co.risks.length?`<div class="sech">Key risks</div><div class="risksec">${co.risks.map(r=>`<div class="ri"><span style="color:${ic(r.icon)};font-size:14px">●</span><div><strong>${r.t}:</strong> ${r.b}</div></div>`).join('')}</div>`:''}
+${co.gc?`<div class="gcb"><div class="gct">🔍 Game-changer — what most analysis misses</div>${co.gc}</div>`:''}
+${co.timing?`<div class="timing"><strong style="color:#042c53">⏱ Wait or invest now?</strong><br><span style="color:var(--tx2)">${co.timing}</span></div>`:''}
+${co.fit?`<div class="fitb" style="background:var(--gl);color:var(--gd)"><strong>Verdict for ${P.name}:</strong> ${co.fit}</div>`:''}
+${co.similar&&co.similar.length?`<div class="sech">Similar companies to research next</div><div class="simr">${co.similar.map(s=>`<div class="simc" onclick="doRes(${JSON.stringify(s.n)})"><div class="simn">${s.n}</div><div class="simw">${s.w}</div><span class="simbdg">${s.b}</span></div>`).join('')}</div>`:''}
+</div>`;
+}
+
+function parse(text){
+  const m=text.match(/<IDATA>([\s\S]*?)<\/IDATA>/);
+  let cards='';
+  const plain=text.replace(/<IDATA>[\s\S]*?<\/IDATA>/g,'').trim();
+  if(m){try{const d=JSON.parse(m[1].trim());if(d.type==='ideas'&&d.items)d.items.forEach((it,i)=>{cards+=buildIdea(it,i);});else if(d.type==='research'&&d.co)cards=buildRes(d.co);}catch(e){console.error(e);}}
+  return(plain?`<div class="bub ai" style="max-width:100%;margin-bottom:4px">${esc(plain)}</div>`:'')+cards;
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+
+function addMsg(cid,html,isUser){
+  const c=document.getElementById(cid);const ld=c.querySelector('.ld-row');if(ld)ld.remove();
+  const w=document.createElement('div');
+  if(isUser){w.className='mr u';w.innerHTML=`<div class="cav u">${P.name.charAt(0).toUpperCase()}</div><div class="bub u">${html}</div>`;}
+  else{w.className='mr';w.innerHTML=`<div class="cav ai">AI</div><div style="flex:1;min-width:0">${html}</div>`;}
+  c.appendChild(w);c.scrollTop=c.scrollHeight;
+  setTimeout(()=>Object.keys(chartRenderers).forEach(id=>{const el=document.getElementById(id);if(el)chartRenderers[id]('1y',null);}),150);
+}
+function addLoad(cid){
+  const c=document.getElementById(cid);const r=document.createElement('div');r.className='mr ld-row';
+  r.innerHTML=`<div class="cav ai">AI</div><div class="bub ai"><div class="ldr"><span></span><span></span><span></span></div></div>`;
+  c.appendChild(r);c.scrollTop=c.scrollHeight;
+}
+
+// API CALL — goes through /api/chat backend (Vercel serverless function)
+const iH=[],rH=[];
+async function callAI(hist){
+  const res=await fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages:hist,system:sys()})
+  });
+  const d=await res.json();
+  if(d.error)throw new Error(d.error);
+  return d.text||'No response.';
+}
+
+async function askI(p){
+  const inp=document.getElementById('i-in');const txt=p||inp.value.trim();if(!txt)return;
+  if(!p)inp.value='';goTab('ideas');
+  addMsg('i-msgs',txt.replace(/</g,'&lt;'),true);iH.push({role:'user',content:txt});addLoad('i-msgs');
+  try{const r=await callAI(iH);iH.push({role:'assistant',content:r});addMsg('i-msgs',parse(r),false);}
+  catch(e){addMsg('i-msgs',`<div class="bub ai" style="color:var(--rd)">⚠️ ${e.message}</div>`,false);}
+}
+async function askR(p){
+  const inp=document.getElementById('r-in');const txt=p||inp.value.trim();if(!txt)return;
+  if(!p)inp.value='';goTab('research');
+  addMsg('r-msgs',txt.replace(/</g,'&lt;'),true);rH.push({role:'user',content:txt});addLoad('r-msgs');
+  try{const r=await callAI(rH);rH.push({role:'assistant',content:r});addMsg('r-msgs',parse(r),false);}
+  catch(e){addMsg('r-msgs',`<div class="bub ai" style="color:var(--rd)">⚠️ ${e.message}</div>`,false);}
+}
+function doRes(name){askR(name+' — full deep-dive. Financials, moat, management, all risks, game-changer, 12-month chart, wait or buy verdict, similar companies.');}
+
+function initChats(){
+  addMsg('i-msgs',`<div class="bub ai">Hi ${P.name}! Based on your profile — cautious beginner, €800, ${P.hor}-year horizon, interested in <em>${P.int}</em> — I'll give you personalised ideas with rich coloured cards, 6-timespan interactive charts, pros/cons boxes, and hidden game-changers others miss. What would you like to explore?</div>`,false);
+  addMsg('r-msgs',`<div class="bub ai">Hi ${P.name}! Type any company or ETF — even roughly or misspelled. I'll figure out what you mean and give you a full deep-dive with a 6-timespan interactive chart (24H · 1W · 1M · 3M · 6M · 1Y), coloured stat boxes, risk breakdown, and similar companies in one click.</div>`,false);
+}
+</script>
+</body>
+</html>
